@@ -75,6 +75,9 @@ spec:
           - name: safeline-k8s
             mountPath: /safeline_k8s.conf
             subPath: safeline_k8s.conf
+          - name: safeline-k8s
+            mountPath: /safeline.conf
+            subPath: safeline.conf
           - name: safeline-tengine-modify-conf
             mountPath: /modify_nginx_conf.sh
             subPath: modify_nginx_conf.sh

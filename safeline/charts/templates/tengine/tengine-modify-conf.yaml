@@ -11,6 +11,7 @@ data:
     source /etc/profile
     sleep 5
     cp -f /safeline_k8s.conf /etc/nginx/safeline_k8s.conf 
+    cp -f /safeline.conf /etc/nginx/safeline.conf
     if [[ $(grep 'safeline_unix.conf' /etc/nginx/nginx.conf) ]];then
       sed -i 's/safeline_unix.conf/safeline_k8s.conf/g' /etc/nginx/nginx.conf
     else
