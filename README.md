@@ -1,5 +1,5 @@
 <h4 align="center">
-  SafeLine - Preview versions - HelmChart - Unofficial production
+  SafeLine - Preview Versions - HelmChart
 </h4>
 
 <p align="center">
