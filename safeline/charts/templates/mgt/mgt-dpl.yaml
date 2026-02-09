@@ -110,6 +110,10 @@ spec:
         {{- else -}}
         - name: mgt
           emptyDir: {}
+        - name: nginx-log
+          emptyDir: {}
+        - name: safeline-sock-dir
+          emptyDir: {}
         {{- end -}}
 
     {{- with .Values.mgt.nodeSelector }}

@@ -3,7 +3,7 @@
 基于 [chaitin/safeline](https://github.com/chaitin/safeline) 的 Kubernetes Helm Chart。
 
 > 原始项目: [yaencn/safeline-helmchart](https://github.com/yaencn/safeline-helmchart)
-> 本版本 (10.1.0) 经过安全加固和最佳实践优化，适配 k3s + Longhorn + MetalLB 环境。
+> 本版本 (10.2.0) 经过安全加固和最佳实践优化，适配 k3s + Longhorn + MetalLB 环境。
 
 ## 环境要求
 
@@ -134,6 +134,25 @@ helm install safeline ./safeline/charts \
   --set global.image.registry=chaitin \
   --set global.image.region="-g"
 ```
+
+## v10.2.0 变更日志（基于 10.1.0 审查优化）
+
+### 安全加固
+- 默认密码 `changeit` 现在会在 `helm install` 时直接报错，强制用户设置强密码
+- `database.external.password` 添加 `required` 校验
+
+### Bug 修复
+- 修复 `database-ss.yaml` initContainer 引用不存在的 `$database.subPath`
+- 修复 `pg_isready` 探针硬编码 `safeline-ce`，改用模板函数动态生成
+- 修复 `mgt-dpl.yaml` 在 `persistence.enabled=false` 时缺少 `nginx-log` 和 `safeline-sock-dir` volume
+- 修复 `tengine-svc.yaml` NodePort 模式下 `httpNodePort`/`healthNodePort` 未映射到模板
+- 修复 Ingress 资源名称硬编码 `waf-dashboard-domain-ingress`，改为跟随 release name
+- 修复 `database-url-secret.yaml` 在 `existingSecret` 已配置时仍重复创建 Secret
+- 修复 `readinessProbe.initialDelaySeconds` 从 30s 降为 5s（数据库就绪探测不应等 30s）
+
+### 其他
+- `appVersion` 从 `9.3.2` 更正为 `10.1.0`
+- NOTES.txt 拼写修正 `managenment` → `management`
 
 ## v10.1.0 变更日志（基于 10.0.32 优化）
 

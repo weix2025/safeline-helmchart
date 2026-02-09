@@ -62,9 +62,12 @@ app: "{{ template "safeline.name" . }}"
 
 {{- define "safeline.database.rawPassword" -}}
   {{- if eq .Values.database.type "internal" -}}
-    {{- .Values.database.internal.password -}}
+    {{- if eq .Values.database.internal.password "changeit" -}}
+      {{- fail "SECURITY: database.internal.password is still 'changeit'. You MUST set a strong password for production use." -}}
+    {{- end -}}
+    {{- required "database.internal.password is required" .Values.database.internal.password -}}
   {{- else -}}
-    {{- .Values.database.external.password -}}
+    {{- required "database.external.password is required when database.type=external" .Values.database.external.password -}}
   {{- end -}}
 {{- end -}}
 

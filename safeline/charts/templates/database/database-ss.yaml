@@ -54,9 +54,6 @@ spec:
         volumeMounts:
           - name: database-data
             mountPath: /var/lib/postgresql/data
-            {{- if $database.subPath }}
-            subPath: {{ $database.subPath }}
-            {{- end }}
       containers:
       - name: database
         {{- if .Values.global.image.registry }}
@@ -89,7 +86,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - pg_isready -U safeline-ce -d safeline-ce
+            - pg_isready -U {{ template "safeline.database.username" . }} -d {{ template "safeline.database.dbname" . }}
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -99,8 +96,8 @@ spec:
             command:
             - /bin/sh
             - -c
-            - pg_isready -U safeline-ce -d safeline-ce
-          initialDelaySeconds: 30
+            - pg_isready -U {{ template "safeline.database.username" . }} -d {{ template "safeline.database.dbname" . }}
+          initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
