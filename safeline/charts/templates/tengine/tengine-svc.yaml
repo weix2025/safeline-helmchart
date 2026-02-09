@@ -5,6 +5,10 @@ metadata:
   labels:
 {{ include "safeline.labels" . | indent 4 }}
 spec:
+  type: {{ .Values.tengine.service.type | default "ClusterIP" }}
+  {{- if and (eq .Values.tengine.service.type "LoadBalancer") .Values.tengine.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.tengine.service.loadBalancerIP }}
+  {{- end }}
   ports:
     - name: health
       protocol: TCP

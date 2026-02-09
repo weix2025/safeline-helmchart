@@ -38,7 +38,7 @@ spec:
       {{- if .Values.global.exposeServicesAsPorts.enabled }}
       initContainers:
       - name: cp-chaos-toml-file
-        image: busybox
+        image: {{ .Values.global.busyboxImage | default "busybox:1.36" }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command:
           - sh
@@ -73,12 +73,21 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "safeline.chaos.env" . }}
+        - secretRef:
+            name: "{{ template "safeline.database" . }}-url"
+        env:
+          - name: TZ
+            value: {{ .Values.global.timezone | default "Asia/Shanghai" }}
         volumeMounts:
-          - name: localtime
-            mountPath: /etc/localtime
-            readOnly: true
           - mountPath: /app/chaos
             name: chaos
+        livenessProbe:
+          tcpSocket:
+            port: {{ template "safeline.http.port" . }}
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          periodSeconds: 10
         readinessProbe:
           tcpSocket:
             port: {{ template "safeline.http.port" . }}
@@ -104,12 +113,9 @@ spec:
             name: {{ template "safeline.chaos" . }}
         - name: safeline-chaos-cp-toml
           configMap:
-            name: safeline-chaos-cp-toml
+            name: {{ template "safeline.chaos" . }}-cp-toml
             defaultMode: 0755
         {{- end }}
-        - name: localtime
-          hostPath:
-            path: /etc/localtime
         {{- if .Values.persistence.enabled }}
         - name: chaos
           persistentVolumeClaim:

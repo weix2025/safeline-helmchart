@@ -42,15 +42,21 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "safeline.fvm.env" . }}
+        env:
+          - name: TZ
+            value: {{ .Values.global.timezone | default "Asia/Shanghai" }}
         ports:
           - name: api
             containerPort: {{ template "safeline.fvm.api.port" . }}
           - name: web
             containerPort: {{ template "safeline.fvm.web.port" . }}
-        volumeMounts:
-          - name: localtime
-            mountPath: /etc/localtime
-            readOnly: true
+        livenessProbe:
+          tcpSocket:
+            port: {{ template "safeline.fvm.web.port" . }}
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          periodSeconds: 10
         readinessProbe:
           tcpSocket:
             port: {{ template "safeline.fvm.web.port" . }}
@@ -63,10 +69,6 @@ spec:
         resources:
 {{ toYaml .Values.fvm.resources | indent 10 }}
 {{- end }}
-      volumes:
-        - name: localtime
-          hostPath:
-            path: /etc/localtime
 
     {{- with .Values.fvm.nodeSelector }}
       nodeSelector:

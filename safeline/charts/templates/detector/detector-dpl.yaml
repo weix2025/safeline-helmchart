@@ -65,14 +65,21 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "safeline.detector.env" . }}
+        env:
+          - name: TZ
+            value: {{ .Values.global.timezone | default "Asia/Shanghai" }}
         volumeMounts:
           - mountPath: /resources/detector
             name: detector
           - mountPath: /logs/detector
             name: logs
-          - name: localtime
-            mountPath: /etc/localtime
-            readOnly: true
+        livenessProbe:
+          tcpSocket:
+            port: {{ template "safeline.detector.sns.port" . }}
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          periodSeconds: 10
         readinessProbe:
           tcpSocket:
             port: {{ template "safeline.detector.sns.port" . }}
@@ -86,10 +93,6 @@ spec:
 {{ toYaml .Values.detector.resources | indent 10 }}
 {{- end }}
       volumes:
-        - name: localtime
-          hostPath:
-            path: /etc/localtime
-
         {{- if .Values.persistence.enabled }}
         - name: detector
           persistentVolumeClaim:
